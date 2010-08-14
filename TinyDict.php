@@ -150,7 +150,7 @@ abstract class TinyDict {
 						$quasiWords = explode(' ', $d);
 						foreach ($quasiWords as &$q) {
 							if ($input == preg_replace($wordPattern, '', $q)) {
-								$result[0][] = $pieces;
+								$result[$k][] = $pieces;
 								break;
 							}
 						}
