@@ -153,9 +153,9 @@ xấu	плохой	6a,adjective
 xấu	некрасивый	6a,adjective
 giỏi	умелый	6a,adjective
 giỏi	искусный	6a,adjective
-giỏi	умело	6a,adjective
-giỏi	искусно	6a,adjective
-giỏi	хорошо	6a,adjective
+giỏi	умело	6a,adverb
+giỏi	искусно	6a,adverb
+giỏi	хорошо	6a,adverb
 hay	хороший	6a,adjective
 hay	интересный	6a,adjective
 hay	хорошо	6a,adverb

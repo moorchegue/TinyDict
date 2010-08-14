@@ -1,4 +1,4 @@
-#!/bin/php
+#!/usr/bin/php
 <?php
 
 $paths = array(
@@ -27,6 +27,9 @@ $slConf = new SimpleLauncher;
 $config = $slConf->getConfig($params, $argv);
 
 $config['input'] = array_pop($argv);
+if (substr($config['input'], 0, 1) == '-') {
+	$config['input'] = '';
+}
 
 // run
 $out = '';

@@ -60,12 +60,12 @@ abstract class TinyDict {
 	 * @return Array
 	 */	
 	public function run() {
-		$result = $this->_search();
+		$result = $this->_search($this->_input, $this->_tags);
 
 		// search normalized word if there's no exact matches
 		if (empty($result) || $this->_input == $this->_normalize($this->_input)) {
 			$this->_input = $this->_normalize($this->_input);
-			$result = $this->_search(true);
+			$result = $this->_search($this->_input, $this->_tags, true);
 		}
 
 		// filter matches by tags
@@ -104,9 +104,12 @@ abstract class TinyDict {
 	/**
 	 * Search
 	 *
+	 * @param String $input
+	 * @param Array $tags
+	 * @param Boolean $normalize
 	 * @return Array
 	 */	
-	private function _search($normalize = false) {
+	private function _search($input, $tags, $normalize = false) {
 		$result = array();
 
 		$file = file_get_contents($this->_dict);
@@ -115,19 +118,40 @@ abstract class TinyDict {
 		foreach ($dict as &$row) {
 			$pieces = explode("\t", $row);
 			$dump = $pieces;
-			if ($normalize) {
-				if (array_key_exists(0, $pieces)) {
-					$dump[0] = $this->_normalize($dump[0]);
+
+			// searchin only by tags
+			if (!empty($tags) && empty($input)) {
+				if (array_key_exists(2, $pieces)) {
+					$dictTags = explode(',', $pieces[2]);
+					$allTagsFound = true;
+					foreach ($tags as &$t) {
+						if (array_search($t, $dictTags) === false) {
+							$allTagsFound = false;
+						}
+					}
+					if ($allTagsFound) {
+						$result[0][] = $pieces;
+					}
 				}
-				if (array_key_exists(1, $pieces)) {
-					$dump[1] = $this->_normalize($dump[1]);
+			// simple or mixed search
+			} else {
+				if ($normalize) {
+					if (array_key_exists(0, $pieces)) {
+						$dump[0] = $this->_normalize($dump[0]);
+					}
+					if (array_key_exists(1, $pieces)) {
+						$dump[1] = $this->_normalize($dump[1]);
+					}
 				}
-			}
-			if (array_key_exists(0, $dump) && $dump[0] == $this->_input) {
-				$result[0][] = $pieces;
-			}
-			if (array_key_exists(1, $dump) && $dump[1] == $this->_input) {
-				$result[1][] = $pieces;
+				if (empty($tags) || (!empty($tags) && (array_key_exists(2, $pieces)
+					&& array_intersect($tags, explode(',', $pieces[2]))))) {
+					if (array_key_exists(0, $dump) && $dump[0] == $this->_input) {
+						$result[0][] = $pieces;
+					}
+					if (array_key_exists(1, $dump) && $dump[1] == $this->_input) {
+						$result[1][] = $pieces;
+					}
+				}
 			}
 		}
 		return $result;
