@@ -4,6 +4,7 @@
  * Tiny Dictionary
  *
  * @author murchik <murchik@nigma.ru>
+ * @version 0.0.1
  */
 abstract class TinyDict {
 
@@ -19,7 +20,6 @@ abstract class TinyDict {
 	 */	
 	private $_input = '';
 	private $_tags = array();
-
 	private $_normalizationMatrixReady = array();
 
 
@@ -68,11 +68,7 @@ abstract class TinyDict {
 			$result = $this->_search($this->_input, $this->_tags, true);
 		}
 
-		// filter matches by tags
-		if (!empty($result)) {
-			$result = $this->_filter($result);
-		}
-
+		// format output
 		$out = '';
 		foreach ($result as $direction => &$translations) {
 			foreach ($translations as &$chars) {
@@ -111,6 +107,8 @@ abstract class TinyDict {
 	 */	
 	private function _search($input, $tags, $normalize = false) {
 		$result = array();
+		$anormalSymbols = implode('', $this->_normalizationMatrixReady['from']);
+		$wordPattern = '/[^a-zа-яё' . $anormalSymbols . ']+/si';
 
 		$file = file_get_contents($this->_dict);
 		$dict = explode("\n", $file);
@@ -145,26 +143,22 @@ abstract class TinyDict {
 				}
 				if (empty($tags) || (!empty($tags) && (array_key_exists(2, $pieces)
 					&& array_intersect($tags, explode(',', $pieces[2]))))) {
-					if (array_key_exists(0, $dump) && $dump[0] == $this->_input) {
-						$result[0][] = $pieces;
-					}
-					if (array_key_exists(1, $dump) && $dump[1] == $this->_input) {
-						$result[1][] = $pieces;
+					foreach ($dump as $k => $d) {
+						if ($k > 1) {
+							break;
+						}
+						$quasiWords = explode(' ', $d);
+						foreach ($quasiWords as &$q) {
+							if ($input == preg_replace($wordPattern, '', $q)) {
+								$result[0][] = $pieces;
+								break;
+							}
+						}
 					}
 				}
 			}
 		}
 		return $result;
-	}
-
-	/**
-	 * Filter by tags
-	 *
-	 * @param Array $words
-	 * @return Array
-	 */	
-	private function _filter($words) {
-		return $words;
 	}
 
 }
