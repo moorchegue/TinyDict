@@ -12,12 +12,12 @@ abstract class TinyDict {
 
 	/**
 	 * @see normalizeInput()
-	 */	
+	 */
 	protected $_normalizationMatrix = array();
 
 	/**
 	 * @see __construct()
-	 */	
+	 */
 	private $_input = '';
 	private $_tags = array();
 	private $_normalizationMatrixReady = array();
@@ -28,7 +28,7 @@ abstract class TinyDict {
 	 *
 	 * @param String $input input word
 	 * @param String $tags comma separated tags to filter
-	 */	
+	 */
 	public function __construct($input, $tags) {
 		$this->_input = trim($input);
 
@@ -58,7 +58,7 @@ abstract class TinyDict {
 	 *
 	 * @param Array $words
 	 * @return Array
-	 */	
+	 */
 	public function run() {
 		$result = $this->_search($this->_input, $this->_tags);
 
@@ -88,7 +88,7 @@ abstract class TinyDict {
 
 	/**
 	 * Normalize input word
-	 */	
+	 */
 	protected function _normalize($input) {
 		$result = str_replace(
 			$this->_normalizationMatrixReady['from'],
@@ -104,7 +104,7 @@ abstract class TinyDict {
 	 * @param Array $tags
 	 * @param Boolean $normalize
 	 * @return Array
-	 */	
+	 */
 	private function _search($input, $tags, $normalize = false) {
 		$result = array();
 		$anormalSymbols = implode('', $this->_normalizationMatrixReady['from']);

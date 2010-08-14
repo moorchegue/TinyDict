@@ -13,7 +13,7 @@ class TinyDictViet extends TinyDict {
 
 	/**
 	 * @see normalizeInput()
-	 */	
+	 */
 	protected $_normalizationMatrix = array(
 		'a'	=> array('á', 'à', 'ã', 'ả', 'ạ', 'ă', 'ắ', 'ằ',
 					'ẵ', 'ẳ', 'ặ', 'â', 'ấ', 'ầ', 'ẫ', 'ẩ', 'ậ'),
