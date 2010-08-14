@@ -33,8 +33,11 @@ abstract class TinyDict {
 		$this->_input = trim($input);
 
 		$this->_tags = explode(',', $tags);
-		foreach ($this->_tags as &$tag) {
+		foreach ($this->_tags as $k => &$tag) {
 			$tag = trim($tag);
+			if (empty($tag)) {
+				unset($this->_tags[$k]);
+			}
 		}
 
 		$this->_dict = dirname(__FILE__) . '/' . $this->_dict;
@@ -60,7 +63,7 @@ abstract class TinyDict {
 		$result = $this->_search();
 
 		// search normalized word if there's no exact matches
-		if (empty($result)) {
+		if (empty($result) || $this->_input == $this->_normalize($this->_input)) {
 			$this->_input = $this->_normalize($this->_input);
 			$result = $this->_search(true);
 		}
@@ -81,7 +84,7 @@ abstract class TinyDict {
 				}
 				$out .= ' (' . str_replace(',', ', ', $chars[2]) . ")\n";
 			}
-			$out .= "\n";
+			//$out .= "\n";
 		}
 
 		return $out;
