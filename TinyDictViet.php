@@ -9,6 +9,8 @@ require_once 'TinyDict/TinyDict.php';
  */
 class TinyDictViet extends TinyDict {
 
+	protected $_dict = 'viet.dict';
+
 	/**
 	 * @see normalizeInput()
 	 */	
@@ -33,5 +35,4 @@ class TinyDictViet extends TinyDict {
 		'Y'	=> array('Ý', 'Ỳ', 'Ỹ', 'Ỷ', 'Ỵ'),
 	);
 
-	protected $_dict = 'viet.dict';
 }

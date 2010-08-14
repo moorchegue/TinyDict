@@ -7,6 +7,8 @@
  */
 abstract class TinyDict {
 
+	protected $_dict = '';
+
 	/**
 	 * @see normalizeInput()
 	 */	
@@ -18,7 +20,7 @@ abstract class TinyDict {
 	private $_input = '';
 	private $_tags = array();
 
-	protected $_dict = '';
+	private $_normalizationMatrixReady = array();
 
 
 	/**
@@ -39,6 +41,13 @@ abstract class TinyDict {
 		if (!file_exists($this->_dict)) {
 			die('Gimme dictionary file');
 		}
+
+		foreach ($this->_normalizationMatrix as $toSym => &$fromArr) {
+			foreach ($fromArr as $fromSym) {
+				$this->_normalizationMatrixReady['from'][] = $fromSym;
+				$this->_normalizationMatrixReady['to'][] = $toSym;
+			}
+		}
 	}
 
 	/**
@@ -52,8 +61,8 @@ abstract class TinyDict {
 
 		// search normalized word if there's no exact matches
 		if (empty($result)) {
-			$this->_input = $this->_normalizeInput();
-			$result = $this->_search();
+			$this->_input = $this->_normalize($this->_input);
+			$result = $this->_search(true);
 		}
 
 		// filter matches by tags
@@ -81,16 +90,11 @@ abstract class TinyDict {
 	/**
 	 * Normalize input word
 	 */	
-	protected function _normalizeInput() {
-		$from = array();
-		$to = array();
-		foreach ($this->_normalizationMatrix as $toSym => &$fromArr) {
-			foreach ($fromArr as $fromSym) {
-				$from[] = $fromSym;
-				$to[] = $toSym;
-			}
-		}
-		$result = str_replace($from, $to, $this->_input);
+	protected function _normalize($input) {
+		$result = str_replace(
+			$this->_normalizationMatrixReady['from'],
+			$this->_normalizationMatrixReady['to'],
+			$input);
 		return $result;
 	}
 
@@ -99,8 +103,7 @@ abstract class TinyDict {
 	 *
 	 * @return Array
 	 */	
-	private function _search() {
-		//exec("grep '" . $this->_input . "' " . $this->_dict, $output);
+	private function _search($normalize = false) {
 		$result = array();
 
 		$file = file_get_contents($this->_dict);
@@ -108,10 +111,19 @@ abstract class TinyDict {
 
 		foreach ($dict as &$row) {
 			$pieces = explode("\t", $row);
-			if (array_key_exists(0, $pieces) && $pieces[0] == $this->_input) {
+			$dump = $pieces;
+			if ($normalize) {
+				if (array_key_exists(0, $pieces)) {
+					$dump[0] = $this->_normalize($dump[0]);
+				}
+				if (array_key_exists(1, $pieces)) {
+					$dump[1] = $this->_normalize($dump[1]);
+				}
+			}
+			if (array_key_exists(0, $dump) && $dump[0] == $this->_input) {
 				$result[0][] = $pieces;
 			}
-			if (array_key_exists(1, $pieces) && $pieces[1] == $this->_input) {
+			if (array_key_exists(1, $dump) && $dump[1] == $this->_input) {
 				$result[1][] = $pieces;
 			}
 		}
