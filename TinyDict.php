@@ -46,7 +46,7 @@ abstract class TinyDict {
 		}
 
 		foreach ($this->_normalizationMatrix as $toSym => &$fromArr) {
-			foreach ($fromArr as $fromSym) {
+			foreach ($fromArr as &$fromSym) {
 				$this->_normalizationMatrixReady['from'][] = $fromSym;
 				$this->_normalizationMatrixReady['to'][] = $toSym;
 			}
@@ -108,7 +108,7 @@ abstract class TinyDict {
 	private function _search($input, $tags, $normalize = false) {
 		$result = array();
 		$anormalSymbols = implode('', $this->_normalizationMatrixReady['from']);
-		$wordPattern = '/[^a-zа-яё' . $anormalSymbols . ']+/si';
+		$wordPattern = '/[^a-zа-яё' . $anormalSymbols . ']+/sui';
 
 		$file = file_get_contents($this->_dict);
 		$dict = explode("\n", $file);
@@ -143,7 +143,7 @@ abstract class TinyDict {
 				}
 				if (empty($tags) || (!empty($tags) && (array_key_exists(2, $pieces)
 					&& array_intersect($tags, explode(',', $pieces[2]))))) {
-					foreach ($dump as $k => $d) {
+					foreach ($dump as $k => &$d) {
 						if ($k > 1) {
 							break;
 						}
