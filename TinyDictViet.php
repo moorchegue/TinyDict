@@ -33,6 +33,10 @@ class TinyDictViet extends TinyDict {
 		'U'	=> array('Ú', 'Ù', 'Ũ', 'Ủ', 'Ụ', 'Ư', 'Ứ', 'Ừ', 'Ữ', 'Ử', 'Ự'),
 		'y'	=> array('ý', 'ỳ', 'ỹ', 'ỷ', 'ỵ'),
 		'Y'	=> array('Ý', 'Ỳ', 'Ỹ', 'Ỷ', 'Ỵ'),
+
+		// @TODO: 'tis nasty. how about true double-dimensional dictionary?
+		'е'	=> array('ё'),
+		'Е'	=> array('Ё'),
 	);
 
 }

@@ -30,7 +30,7 @@ abstract class TinyDict {
 	 * @param String $tags comma separated tags to filter
 	 */
 	public function __construct($input, $tags) {
-		$this->_input = trim($input);
+		$this->_input = mb_strtolower(trim($input));
 
 		$this->_tags = explode(',', $tags);
 		foreach ($this->_tags as $k => &$tag) {
@@ -149,7 +149,8 @@ abstract class TinyDict {
 						}
 						$quasiWords = explode(' ', $d);
 						foreach ($quasiWords as &$q) {
-							if ($input == preg_replace($wordPattern, '', $q)) {
+							$q = mb_strtolower(preg_replace($wordPattern, '', $q));
+							if ($input == $q) {
 								$result[$k][] = $pieces;
 								break;
 							}
