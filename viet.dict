@@ -293,55 +293,54 @@ không	нет	8a,particle
 vâng	да	8a,particle
 à	вопр. частица	8a,particle
 Hải Phòng	Хайфонг	8a,noun,proper
-uống	пить	9a
-giường	кровать	9a
-tiếng	звук, голос; язык	9a
-tiếng Việt	вьетнамский язык	9a
-len	шерсть	9a
-lụa	шелк (ткань)	9a
-đá	камень	9a
-xanh	голубой, зеленый	9a
-màu (mầu)	цвет	9a
-nặng	тяжелый	9a
-tên	имя	9a
-Liên Xô	Советский союз	9a
-Việt Nam	Вьетнам	9a
-Ấn Độ	Индия	9a
-Pháp	Франция	9a
-Anh	Англия	9a
-kia	та, тот, те	9a
-Порядковые числительные
-thứ nhất	первый	9a
-thứ hai	второй	9a
-thứ ba	третий	9a
-thứ tư	четвертый	9a
-sinh	родиться	10a
-làm việc	работать	10a
-sân	двор	10a
-phòng	комната	10a
-việc	дело, работа	10a
-vườn	сад	10a
-ở	быть, находиться; проживать	10a
-ở	в, на (предлог, указывающий на место совершения действия)	10a
-Đức	Германия	10a
-Lào	Лаос	10a
-Cam-pu-chia	Кампучия (Камбоджа)	10a
-trên	вверх, на, над	10a
-dưới	низ, внизу, под	10a
-trong	внутрь; внутри, в	10a
-trong	в течение	10a
-ngoài	снаружи, вне	10a
-trước	впереди; перед	10a
-trước	сначала	10a
-trước	до	10a
-giữa	середина, посреди, посередине, между, среди	10a
-sau	задний, позади, за	10a
-sau	после	10a
-nghề	ремесло, профессия	10a
-trường đại học tổng hợp	университет	10a
-trường	учебное заведение, школа	10a
-trường đại học	институт, высшее учебное заведение	10a
-tổng hợp	универсальный	10a
+uống	пить	9a,verb
+giường	кровать	9a,noun
+tiếng	звук, голос; язык	9a,noun
+tiếng Việt	вьетнамский язык	9a,noun
+len	шерсть	9a,noun
+lụa	шелк (ткань)	9a,noun
+đá	камень	9a,noun
+xanh	голубой, зеленый	9a,adjective,color
+màu (mầu)	цвет	9a,noun,color
+nặng	тяжелый	9a,adjective
+tên	имя	9a,noun
+Liên Xô	Советский союз	9a,noun,proper
+Việt Nam	Вьетнам	9a,noun,proper
+Ấn Độ	Индия	9a,noun,proper
+Pháp	Франция	9a,noun,proper
+Anh	Англия	9a,noun,proper
+kia	та, тот, те	9a,pronoun
+thứ nhất	первый	9a,number
+thứ hai	второй	9a,number
+thứ ba	третий	9a,number
+thứ tư	четвертый	9a,number
+sinh	родиться	10a,verb
+làm việc	работать	10a,verb
+sân	двор	10a,noun
+phòng	комната	10a,noun
+việc	дело, работа	10a,noun
+vườn	сад	10a,noun
+ở	быть, находиться; проживать	10a,verb
+ở	в, на (предлог, указывающий на место совершения действия)	10a,preposition
+Đức	Германия	10a,noun,proper
+Lào	Лаос	10a,noun,proper
+Cam-pu-chia	Кампучия (Камбоджа)	10a,noun,proper
+trên	вверх, на, над	10a,adverb,preposition
+dưới	низ, внизу, под	10a,noun,adverb,preposition
+trong	внутрь; внутри, в	10a,adverb,preposition
+trong	в течение	10a,adverb
+ngoài	снаружи, вне	10a,adverb,preposition
+trước	впереди; перед	10a,adverb,preposition
+trước	сначала	10a,adverb
+trước	до	10a,preposition
+giữa	середина, посреди, посередине, между, среди	10a,adverb,preposition
+sau	задний, позади, за	10a,adjective,adverb,preposition
+sau	после	10a,adverb,preposition
+nghề	ремесло, профессия	10a,noun,profession
+trường đại học tổng hợp	университет	10a,noun
+trường	учебное заведение, школа	10a,noun
+trường đại học	институт, высшее учебное заведение	10a,noun
+tổng hợp	универсальный	10a,adjective
 mấy	несколько	1
 nhiều	много	1
 ít	мало	1
