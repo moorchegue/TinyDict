@@ -72,6 +72,9 @@ abstract class TinyDict {
 		$out = '';
 		foreach ($result as $direction => &$translations) {
 			foreach ($translations as &$chars) {
+				$chars[0] = array_key_exists(0, $chars) ? $chars[0] : '';
+				$chars[1] = array_key_exists(1, $chars) ? $chars[1] : '';
+				$chars[2] = array_key_exists(2, $chars) ? $chars[2] : '';
 				if ($direction == 0) {
 					$out .= $chars[0] . "\t—\t" . $chars[1];
 				}
@@ -147,6 +150,10 @@ abstract class TinyDict {
 						if ($k > 1) {
 							break;
 						}
+						if ($input == $d) {
+							$result[$k][] = $pieces;
+							break;
+						}						
 						$quasiWords = explode(' ', $d);
 						foreach ($quasiWords as &$q) {
 							$q = mb_strtolower(preg_replace($wordPattern, '', $q));

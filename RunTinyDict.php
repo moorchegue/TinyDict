@@ -26,10 +26,16 @@ $params = array(
 $slConf = new SimpleLauncher;
 $config = $slConf->getConfig($params, $argv);
 
-$config['input'] = array_pop($argv);
-if (substr($config['input'], 0, 1) == '-') {
-	$config['input'] = '';
+unset($argv[0]);
+$inputWords = array();
+while(count($argv)) {
+	$word = array_pop($argv);
+	if (substr($word, 0, 1) == '-') {
+		break;
+	}
+	$inputWords[] = $word;
 }
+$config['input'] = implode(' ', array_reverse($inputWords));
 
 // run
 $out = '';
