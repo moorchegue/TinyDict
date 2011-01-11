@@ -8,7 +8,6 @@ $paths = array(
 
 set_include_path(implode(PATH_SEPARATOR, $paths));
 mb_internal_encoding('UTF-8');
-date_default_timezone_set(@date_default_timezone_get());
 
 require_once 'Launcher/SimpleLauncher.php';
 require_once 'TinyDict/TinyDictViet.php';
