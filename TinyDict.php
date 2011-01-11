@@ -101,10 +101,6 @@ abstract class TinyDict {
 		$tagList = array();
 		foreach ($dict as &$row) {
 			$pieces = explode("\t", $row);
-			if (count($pieces) < 3) {
-				continue;
-			}
-
 			$tags = array_pop($pieces);
 			$wordTags = explode(',', $tags);
 
