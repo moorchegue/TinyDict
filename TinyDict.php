@@ -90,6 +90,44 @@ abstract class TinyDict {
 	}
 
 	/**
+	 * Get tag list
+	 *
+	 * @return String $out
+	 */
+	public function getTagList() {
+		$file = file_get_contents($this->_dict);
+		$dict = explode("\n", $file);
+
+		$tagList = array();
+		foreach ($dict as &$row) {
+			$pieces = explode("\t", $row);
+			if (count($pieces) < 3) {
+				continue;
+			}
+
+			$tags = array_pop($pieces);
+			$wordTags = explode(',', $tags);
+
+			foreach ($wordTags as &$tag) {
+				if (!array_key_exists($tag, $tagList)) {
+					$tagList[$tag] = 1;
+				} else {
+					$tagList[$tag]++;
+				}
+			}
+		}
+
+		ksort($tagList);
+
+		$out = '';
+		foreach ($tagList as $tag => &$count) {
+			$out .= $tag . "\n";
+		}
+
+		return $out;
+	}
+
+	/**
 	 * Normalize input word
 	 */
 	protected function _normalize($input) {
