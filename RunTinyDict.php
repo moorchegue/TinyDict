@@ -11,6 +11,7 @@ mb_internal_encoding('UTF-8');
 
 require_once 'Launcher/SimpleLauncher.php';
 require_once 'TinyDict/TinyDictViet.php';
+require_once 'TinyDict/TinyDictNadsat.php';
 
 // параметры
 $config = array();
