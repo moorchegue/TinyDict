@@ -8,6 +8,8 @@
  */
 abstract class TinyDict {
 
+	const COUNTING_TAG_PATTERN = '/^(?<count>[0-9]+)(?<name>[a-z]*)$/isUx';
+
 	protected $_dict = '';
 
 	/**
@@ -105,7 +107,10 @@ abstract class TinyDict {
 			$wordTags = explode(',', $tags);
 
 			foreach ($wordTags as &$tag) {
-				if (!array_key_exists($tag, $tagList)) {
+				if (!$tag) {
+					continue;
+				}
+				elseif (!array_key_exists($tag, $tagList)) {
 					$tagList[$tag] = 1;
 				} else {
 					$tagList[$tag]++;
@@ -113,7 +118,7 @@ abstract class TinyDict {
 			}
 		}
 
-		ksort($tagList);
+		uksort($tagList, __CLASS__ . '::tagCompare');
 
 		$out = '';
 		foreach ($tagList as $tag => &$count) {
@@ -201,6 +206,41 @@ abstract class TinyDict {
 			}
 		}
 		return $result;
+	}
+
+	/**
+	 * Tag comparation resource function
+	 *
+	 * @param Mixed $a
+	 * @param Mixed $b
+	 * @return Integer
+	 */
+	public static function tagCompare($a, $b) {
+		if ($a == $b) {
+			return 0;
+		}
+
+		if (preg_match(self::COUNTING_TAG_PATTERN, $a, $aPieces)
+			&& preg_match(self::COUNTING_TAG_PATTERN, $b, $bPieces)) {
+			if (($aPieces['name'] && $bPieces['name'])
+				|| (!$aPieces['name'] && !$bPieces['name'])) {
+				return $aPieces['count'] < $bPieces['count'] ? -1 : 1;
+			}
+			elseif ($aPieces['name']) {
+				return 1;
+			}
+			elseif ($bPieces['name']) {
+				return -1;
+			}
+		}
+		elseif (preg_match(self::COUNTING_TAG_PATTERN, $a)) {
+			return -1;
+		}
+		elseif (preg_match(self::COUNTING_TAG_PATTERN, $b)) {
+			return 1;
+		}
+
+		return $a < $b ? -1 : 1;
 	}
 
 }
