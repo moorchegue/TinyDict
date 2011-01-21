@@ -56,12 +56,12 @@ abstract class TinyDict {
 	}
 
 	/**
-	 * Try to find matches
+	 * Try to find all the matches
 	 *
 	 * @param Array $words
 	 * @return Array
 	 */
-	public function run() {
+	public function greedySearch() {
 		$result = $this->_search($this->_input, $this->_tags);
 
 		// search normalized word if there's no exact matches

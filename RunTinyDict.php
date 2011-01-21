@@ -19,7 +19,7 @@ $params = array(
 	'i|input'	=> '',
 	't|tags'	=> '',
 	'c|class'	=> 'Viet',
-	'a|action'	=> 'run',
+	'a|action'	=> 'greedySearch',
 );
 
 // обработать консольный ввод
