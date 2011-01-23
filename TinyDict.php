@@ -4,7 +4,7 @@
  * Tiny Dictionary
  *
  * @author murchik <murchik@nigma.ru>
- * @version 0.0.1
+ * @version 0.0.2
  */
 abstract class TinyDict {
 
@@ -129,6 +129,110 @@ abstract class TinyDict {
 	}
 
 	/**
+	 * Test user
+	 *
+	 * @param Int $count
+	 * @access public
+	 * @return void
+	 * @author Vsevolod Velichko <torkvemada@nigma.ru>
+	 */
+	public function testUser() {
+		
+		$count = (((int) $this->_input) < 2) ? 20 : ((int) $this->_input);
+
+		$countOrig = $count / 2;
+		$count -= $countOrig;
+
+		// reading dictionary in original way
+		$fh = fopen($this->_dict, "rb");
+		while (!feof($fh))
+		{
+			$row = trim(fgets($fh));
+			if (empty($row)) {
+				continue;
+			}
+
+			$parts = explode("\t", $row);
+			if (count($parts) < 3) {
+				continue;
+			}
+
+			$tags = explode(',', trim($parts[2]));
+			$word0 = $this->_normalize(trim($parts[0]));
+			$word1 = $this->_normalize(trim($parts[1]));
+			if (!isset($dictContents[$word0])) {
+				$dictContents[$word0] = array();
+			}
+			if (!isset($dictContents[$word1])) {
+				$dictContents[$word1] = array();
+			}
+			$dictContents[$word0][] = array(
+				'word' => trim($parts[0]),
+				'translation' => trim($parts[1]),
+				'tags' => $tags,
+				'direction' => 0
+			);
+			$dictContents[$word1][] = array(
+				'word' => trim($parts[1]),
+				'translation' => trim($parts[0]),
+				'tags' => $tags,
+				'direction' => 1
+			);
+		}
+		fclose($fh);
+
+		$dictCopy = array();
+		foreach($dictContents as $rows) {
+			$dictCopy = array_merge(
+				$dictCopy,
+				array_filter($rows, array($this, "_filterRowByTags"))
+			);
+		}
+
+		if (count($dictCopy) == 0) {
+			echo "No words matching tag list\n";
+			return;
+		} elseif (count($dictCopy) < ($count + $countOrig)) 	{
+			echo "Too many questions for such small word list\n";
+			return;
+		}
+
+		$right = 0;
+		foreach (array(0 => $count, 1 => $countOrig) as $direction => $cnt) {
+			while ($cnt > 0) {
+				$found = false;
+				$attempts = 30;
+				while (!$found && $attempts > 0) {
+					$key = array_rand($dictCopy);
+					if ($dictCopy[$key]['direction'] == $direction) {
+						$found = true;
+					}
+					$attempts--;
+				}
+				if ($attempts == 0) {
+					echo "Can't find, what to ask, continuing.";
+					break;
+				}
+				fwrite(STDOUT, $dictCopy[$key]['word'] . "\n");
+				$answer = trim(fgets(STDIN));
+				if ($answer == $dictCopy[$key]['translation']) {
+					$right++;
+					fwrite(STDOUT, "OK!\n\n");
+				} else {
+					fwrite(STDOUT, "Правильный вариант: "
+						. $dictCopy[$key]['translation'] . "\n\n");
+				}
+				unset($dictCopy[$key]);
+				$cnt--;
+			}
+		}
+
+		echo "Statistics\n"
+			. "Right:\t" . $right . ".\n"
+			. "Wrong:\t" . ($count + $countOrig - $right) . ".\n";
+	}
+
+	/**
 	 * Normalize input word
 	 */
 	protected function _normalize($input) {
@@ -137,6 +241,23 @@ abstract class TinyDict {
 			$this->_normalizationMatrixReady['to'],
 			$input);
 		return $result;
+	}
+
+	/**
+	 * Check if row contents contain neccessary tags
+	 *
+	 * @param Array $row
+	 * @access protected
+	 * @return Boolean
+	 * @author Vsevolod Velichko <torkvemada@nigma.ru>
+	 */
+	protected function _filterRowByTags($row) {
+		if (count($this->_tags) > 0
+			&& count(array_intersect($row['tags'], $this->_tags))
+				!= count($this->_tags)) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
