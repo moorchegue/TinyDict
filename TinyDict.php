@@ -1,5 +1,7 @@
 <?php
 
+require_once 'CharSeparatedValues/CharSeparatedValues.php';
+
 /**
  * Tiny Dictionary
  *
@@ -11,6 +13,7 @@ abstract class TinyDict {
 	const COUNTING_TAG_PATTERN = '/^(?<count>[0-9]+)(?<name>[a-z]*)$/isUx';
 
 	protected $_dict = '';
+	protected $_searchIn = array('original', 'translation');
 
 	/**
 	 * @see normalizeInput()
@@ -70,22 +73,14 @@ abstract class TinyDict {
 			$result = $this->_search($this->_input, $this->_tags, true);
 		}
 
-		// format output
+		return $this->_formatOutput($result);
+	}
+
+	protected function _formatOutput($result) {
 		$out = '';
-		foreach ($result as $direction => &$translations) {
-			foreach ($translations as &$chars) {
-				$chars[0] = array_key_exists(0, $chars) ? $chars[0] : '';
-				$chars[1] = array_key_exists(1, $chars) ? $chars[1] : '';
-				$chars[2] = array_key_exists(2, $chars) ? $chars[2] : '';
-				if ($direction == 0) {
-					$out .= $chars[0] . "\t—\t" . $chars[1];
-				}
-				if ($direction == 1) {
-					$out .= $chars[1] . "\t—\t" . $chars[0];
-				}
-				$out .= ' (' . str_replace(',', ', ', $chars[2]) . ")\n";
-			}
-			//$out .= "\n";
+		foreach ($result as &$chars) {
+			$out .= $chars->original . "\t—\t" . $chars->translation;
+			$out .= ' (' . str_replace(',', ', ', $chars->tags) . ")\n";
 		}
 
 		return $out;
@@ -270,20 +265,14 @@ abstract class TinyDict {
 	 */
 	private function _search($input, $tags, $normalize = false) {
 		$result = array();
-		$anormalSymbols = implode('', $this->_normalizationMatrixReady['from']);
-		$wordPattern = '/[^a-zа-яё' . $anormalSymbols . ']+/sui';
 
-		$file = file_get_contents($this->_dict);
-		$dict = explode("\n", $file);
+		$dict = new CharSeparatedValues($this->_dict, true, "\t");
 
-		foreach ($dict as &$row) {
-			$pieces = explode("\t", $row);
-			$dump = $pieces;
-
+		foreach ($dict as $pieces) {
 			// searchin only by tags
 			if (!empty($tags) && empty($input)) {
-				if (array_key_exists(2, $pieces)) {
-					$dictTags = explode(',', $pieces[2]);
+				if ($dict->tags) {
+					$dictTags = explode(',', $dict->tags);
 					$allTagsFound = true;
 					foreach ($tags as &$t) {
 						if (array_search($t, $dictTags) === false) {
@@ -291,34 +280,31 @@ abstract class TinyDict {
 						}
 					}
 					if ($allTagsFound) {
-						$result[0][] = $pieces;
+						$result[] = clone $dict;
 					}
 				}
 			// simple or mixed search
 			} else {
+				$normalized = array();
 				if ($normalize) {
-					if (array_key_exists(0, $pieces)) {
-						$dump[0] = $this->_normalize($dump[0]);
-					}
-					if (array_key_exists(1, $pieces)) {
-						$dump[1] = $this->_normalize($dump[1]);
+					foreach ($this->_searchIn as $searchIn) {
+						if ($dict->$searchIn) {
+							$normalized[$searchIn] = $this->_normalize($dict->$searchIn);
+						}
 					}
 				}
-				if (empty($tags) || (!empty($tags) && (array_key_exists(2, $pieces)
-					&& array_intersect($tags, explode(',', $pieces[2]))))) {
-					foreach ($dump as $k => &$d) {
-						if ($k > 1) {
-							break;
-						}
+				if (empty($tags) || (!empty($tags) && ($dict->tags
+					&& array_intersect($tags, explode(',', $dict->tags))))) {
+					foreach ($normalized as $searchIn => &$d) {
 						if ($input == $d) {
-							$result[$k][] = $pieces;
+							$result[] = clone $dict;
 							break;
 						}						
-						$quasiWords = explode(' ', $d);
+						$quasiWords = $this->_getQuasiWords($d);
 						foreach ($quasiWords as &$q) {
-							$q = mb_strtolower(preg_replace($wordPattern, '', $q));
+							$q = $this->_cleanQuasiWord($q);
 							if ($input == $q) {
-								$result[$k][] = $pieces;
+								$result[] = clone $dict;
 								break;
 							}
 						}
@@ -327,6 +313,16 @@ abstract class TinyDict {
 			}
 		}
 		return $result;
+	}
+
+	protected function _getQuasiWords($phrase) {
+		return explode(' ', $phrase);
+	}
+
+	protected function _cleanQuasiWord($q) {
+		$abnormalSymbols = implode('', $this->_normalizationMatrixReady['from']);
+		$wordPattern = '/[^a-zа-яё' . $abnormalSymbols . ']+/sui';
+		return mb_strtolower(preg_replace($wordPattern, '', $q));
 	}
 
 	/**
