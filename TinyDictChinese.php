@@ -10,7 +10,10 @@ require_once 'TinyDict/TinyDict.php';
 class TinyDictChinese extends TinyDict {
 
 	protected $_dict = 'npcr.dict';
-	protected $_searchIn = array('simplified', 'pinyin', 'translation');
+	protected $_searchIn = array('simplified', 'traditional', 'pinyin', 'translation');
+	protected $_testColumns = array('simplified', 'translation');
+
+	private $_chineseCharacters = array('simplified', 'traditional');
 
 	/**
 	 * @see normalizeInput()
@@ -29,17 +32,26 @@ class TinyDictChinese extends TinyDict {
 
 	);
 
-	protected function _getQuasiWords($phrase) {
-		$words = array();
-		for ($i = 0; mb_strlen($phrase) > $i; $i++) {
-			$words[] = mb_substr($phrase, $i, 1);
+	protected function _getQuasiWords($column, $phrase) {
+		if (in_array($column, $this->_chineseCharacters)) {
+			$words = array();
+			for ($i = 0; mb_strlen($phrase) > $i; $i++) {
+				$words[] = mb_substr($phrase, $i, 1);
+			}
+			return $words;
+		} else {
+			return parent::_getQuasiWords($column, $phrase);
 		}
-		return $words;
 	}
 
+	/**
+	 * These are just from NCPR.
+	 *
+	 * TODO: find out about chinese characters ranges and put it in regexp.
+	 */
 	protected function _cleanQuasiWord($q) {
 		$wordPattern = '/[-0-9\s!"\'\(\),\.\/;\?，…]+/sui';
-		return mb_strtolower(preg_replace($wordPattern, '', $q));
+		return preg_replace($wordPattern, '', $q);
 	}
 	
 	protected function _formatOutput($result) {

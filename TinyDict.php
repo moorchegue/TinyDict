@@ -14,6 +14,7 @@ abstract class TinyDict {
 
 	protected $_dict = '';
 	protected $_searchIn = array('original', 'translation');
+	protected $_testColumns = array('original', 'translation');
 
 	/**
 	 * @see normalizeInput()
@@ -132,6 +133,8 @@ abstract class TinyDict {
 	 * @author Vsevolod Velichko <torkvemada@nigma.ru>
 	 */
 	public function testUser() {
+		$column0 = $this->_testColumns[0];
+		$column1 = $this->_testColumns[1];
 		
 		$count = (((int) $this->_input) < 2) ? 20 : ((int) $this->_input);
 
@@ -139,22 +142,11 @@ abstract class TinyDict {
 		$count -= $countOrig;
 
 		// reading dictionary in original way
-		$fh = fopen($this->_dict, "rb");
-		while (!feof($fh))
-		{
-			$row = trim(fgets($fh));
-			if (empty($row)) {
-				continue;
-			}
+		$dict = new CharSeparatedValues($this->_dict, true, "\t");
 
-			$parts = explode("\t", $row);
-			if (count($parts) < 3) {
-				continue;
-			}
-
-			$tags = explode(',', trim($parts[2]));
-			$word0 = $this->_normalize(trim($parts[0]));
-			$word1 = $this->_normalize(trim($parts[1]));
+		foreach ($dict as $pieces) {
+			$word0 = $this->_normalize($dict->$column0);
+			$word1 = $this->_normalize($dict->$column1);
 			if (!isset($dictContents[$word0])) {
 				$dictContents[$word0] = array();
 			}
@@ -162,19 +154,18 @@ abstract class TinyDict {
 				$dictContents[$word1] = array();
 			}
 			$dictContents[$word0][] = array(
-				'word' => trim($parts[0]),
-				'translation' => trim($parts[1]),
-				'tags' => $tags,
+				'word' => trim($dict->$column0),
+				'translation' => trim($dict->$column1),
+				'tags' => explode(',', $dict->tags),
 				'direction' => 0
 			);
 			$dictContents[$word1][] = array(
-				'word' => trim($parts[1]),
-				'translation' => trim($parts[0]),
-				'tags' => $tags,
+				'word' => trim($dict->$column1),
+				'translation' => trim($dict->$column0),
+				'tags' => explode(',', $dict->tags),
 				'direction' => 1
 			);
 		}
-		fclose($fh);
 
 		$dictCopy = array();
 		foreach($dictContents as $rows) {
@@ -214,7 +205,7 @@ abstract class TinyDict {
 					$right++;
 					fwrite(STDOUT, "OK!\n\n");
 				} else {
-					fwrite(STDOUT, "Правильный вариант: "
+					fwrite(STDOUT, "Correct answer: "
 						. $dictCopy[$key]['translation'] . "\n\n");
 				}
 				unset($dictCopy[$key]);
@@ -295,18 +286,24 @@ abstract class TinyDict {
 				}
 				if (empty($tags) || (!empty($tags) && ($dict->tags
 					&& array_intersect($tags, explode(',', $dict->tags))))) {
+
+					$found = false;
 					foreach ($normalized as $searchIn => &$d) {
 						if ($input == $d) {
 							$result[] = clone $dict;
 							break;
 						}						
-						$quasiWords = $this->_getQuasiWords($d);
+						$quasiWords = $this->_getQuasiWords($searchIn, $d);
 						foreach ($quasiWords as &$q) {
 							$q = $this->_cleanQuasiWord($q);
 							if ($input == $q) {
 								$result[] = clone $dict;
+								$found = true;
 								break;
 							}
+						}
+						if ($found) {
+							break;
 						}
 					}
 				}
@@ -315,14 +312,25 @@ abstract class TinyDict {
 		return $result;
 	}
 
-	protected function _getQuasiWords($phrase) {
+	/**
+	 * Get a minimal sense-containing parts of the phrase.
+	 *
+	 * Some languages has space character as a word separator, some doesn't.
+	 * Some doesn't even have words as we know it.
+	 */
+	protected function _getQuasiWords($column, $phrase) {
 		return explode(' ', $phrase);
 	}
 
-	protected function _cleanQuasiWord($q) {
+	/**
+	 * Getting rid of meaningless characters.
+	 *
+	 * Like punctuation or any other improper characters of chosen language.
+	 */
+	protected function _cleanQuasiWord($word) {
 		$abnormalSymbols = implode('', $this->_normalizationMatrixReady['from']);
 		$wordPattern = '/[^a-zа-яё' . $abnormalSymbols . ']+/sui';
-		return mb_strtolower(preg_replace($wordPattern, '', $q));
+		return mb_strtolower(preg_replace($wordPattern, '', $word));
 	}
 
 	/**
